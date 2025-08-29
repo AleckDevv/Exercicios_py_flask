@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template
+from flask import render_template, request
 
 
 @app.route("/")
@@ -7,17 +7,37 @@ def homepage():
     return render_template("index.html")
 
 
-@app.route("/imc/")
-def imc_usuario(peso, altura):
-    for i in range(2):
-        altura = float(input("Digite sua altura: "))
-        peso = float(input("Digite o seu peso: "))
+@app.route("/imc", methods=["GET", "POST"])
+def imc_usuario():
+    # se o método for post, significa que enviou o formulário
+    if request.method == "POST":
+        try:
+            peso_str = request.form.get("peso").replace(",", ".")
+            altura_str = request.form.get("altura").replace(",", ".")
 
-        calculo_imc = peso / altura**2
+            peso = float(peso_str)
+            altura = float(altura_str)
 
-        if calculo_imc < 18.5:
-            print(f"Magreza... seu peso é {calculo_imc}")
-        elif calculo_imc > 18.5 and calculo_imc >= 24.9:
-            print(f"Normal... seu peso é {calculo_imc}")
-        elif calculo_imc > 29.9:
-            print(f"Sobrepeso... seu peso é {calculo_imc}")
+            if altura == 0:
+                raise ValueError("A altura não pode ser zero")
+
+            calculo = peso / (altura**2)
+            resultado_imc = round(calculo, 2)
+
+            if resultado_imc < 18.5:
+                classificacao = "Magreza"
+            elif 18.5 <= resultado_imc < 25:
+                classificacao = "Normal"
+            elif 25 <= resultado_imc < 30:
+                classificacao = "Sobrepeso"
+            else:
+                classificacao = "Obesidade"
+
+            return render_template(
+                "index.html", resultado=resultado_imc, classificacao=classificacao
+            )
+        except (ValueError, ZeroDivisionError) as erro:
+            erro = "Por favor, insira valores válidos"
+            return render_template("index.html", erro=erro)
+
+    return render_template("index.html")

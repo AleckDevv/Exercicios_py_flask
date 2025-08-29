@@ -2,10 +2,30 @@
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ex Flask</title>
+    <title>Calculadora de IMC</title>
   </head>
   <body>
-    <h1>Página flask rodando</h1>
+    <h1>Calculadora de IMC</h1>
+
+    {% if erro %}
+    <p style="color: red"><strong>Erro: {{ erro }}</strong></p>
+    {% endif %}
+
+    <form action="/imc" method="post">
+      <label for="peso">Seu peso (em kg):</label><br />
+      <input type="text" id="peso" name="peso" required /><br /><br />
+
+      <label for="altura">Sua altura (em metros, ex: 1.75):</label><br />
+      <input type="text" id="altura" name="altura" required /><br /><br />
+
+      <button type="submit">Calcular</button>
+    </form>
+
+    {% if resultado %}
+    <hr />
+    <h2>Seu resultado:</h2>
+    <p>Seu IMC é <strong>{{ resultado }}</strong>.</p>
+    <p>Classificação: <strong>{{ classificacao }}</strong></p>
+    {% endif %}
   </body>
 </html>
